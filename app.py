@@ -18,7 +18,7 @@ CORS(app)
 # Database Configuration
 # -----------------------
 
-database_url = os.environ.get("postgresql://harshu:BXl2cZAhRYNHVQLCk5CVFKfsFlEjCyYe@dpg-d6l79hrh46gs73dlpslg-a/smart_task_manager_4w8t")
+database_url = os.environ.get("DATABASE_URL")
 
 if database_url is None:
     raise RuntimeError("DATABASE_URL is not set")
