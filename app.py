@@ -6,9 +6,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 import os
 
-# -----------------------
-# Logging Setup
-# -----------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
@@ -23,8 +20,10 @@ CORS(app)
 
 database_url = os.environ.get("postgresql://harshu:BXl2cZAhRYNHVQLCk5CVFKfsFlEjCyYe@dpg-d6l79hrh46gs73dlpslg-a/smart_task_manager_4w8t")
 
-# Fix for Render postgres URL
-if database_url and database_url.startswith("postgres://"):
+if database_url is None:
+    raise RuntimeError("DATABASE_URL is not set")
+
+if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
@@ -40,27 +39,10 @@ class Task(db.Model):
     __tablename__ = "tasks"
 
     id = db.Column(db.Integer, primary_key=True)
-
-    title = db.Column(
-        db.String(255),
-        nullable=False
-    )
-
-    deadline = db.Column(
-        db.DateTime,
-        nullable=False
-    )
-
-    created_at = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=datetime.utcnow
-    )
-
-    completed_at = db.Column(
-        db.DateTime,
-        nullable=True
-    )
+    title = db.Column(db.String(255), nullable=False)
+    deadline = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime, nullable=True)
 
     status = db.Column(
         db.Enum("pending", "completed", "missed"),
@@ -68,31 +50,21 @@ class Task(db.Model):
         default="pending"
     )
 
-    reschedule_count = db.Column(
-        db.Integer,
-        nullable=False,
-        default=0
-    )
+    reschedule_count = db.Column(db.Integer, nullable=False, default=0)
 
     def to_dict(self):
         return {
             "id": self.id,
             "title": self.title,
-            "deadline": self.deadline.isoformat() if self.deadline else None,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "deadline": self.deadline.isoformat(),
+            "created_at": self.created_at.isoformat(),
             "completed_at": self.completed_at.isoformat() if self.completed_at else None,
             "status": self.status,
             "reschedule_count": self.reschedule_count
         }
 
-
-# -----------------------
-# Create Tables
-# -----------------------
-
 with app.app_context():
     db.create_all()
-
 
 # -----------------------
 # Routes
@@ -102,20 +74,13 @@ with app.app_context():
 def home():
     return "Smart Task Manager Backend Running 🚀"
 
-
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
-
     tasks = Task.query.all()
-
-    logging.info("Fetched all tasks")
-
     return jsonify([task.to_dict() for task in tasks])
-
 
 @app.route("/tasks", methods=["POST"])
 def create_task():
-
     data = request.json
 
     task = Task(
@@ -126,12 +91,7 @@ def create_task():
     db.session.add(task)
     db.session.commit()
 
-    logging.info(
-        f"Task created | id={task.id} | title='{task.title}' | deadline={task.deadline}"
-    )
-
     return jsonify(task.to_dict()), 201
-
 
 @app.route("/tasks/<int:id>/complete", methods=["PATCH"])
 def complete_task(id):
@@ -139,11 +99,9 @@ def complete_task(id):
     task = Task.query.get(id)
 
     if not task:
-        logging.warning(f"Task completion failed | id={id} not found")
         return {"error": "Task not found"}, 404
 
     if task.status == "completed":
-        logging.warning(f"Task already completed | id={id}")
         return {"error": "Task already completed"}, 409
 
     task.status = "completed"
@@ -151,10 +109,7 @@ def complete_task(id):
 
     db.session.commit()
 
-    logging.info(f"Task completed | id={task.id}")
-
     return jsonify(task.to_dict())
-
 
 @app.route("/tasks/<int:id>", methods=["DELETE"])
 def delete_task(id):
@@ -162,37 +117,29 @@ def delete_task(id):
     task = Task.query.get(id)
 
     if not task:
-        logging.warning(f"Delete failed | task id={id} not found")
         return {"error": "Task not found"}, 404
 
     db.session.delete(task)
     db.session.commit()
 
-    logging.info(f"Task deleted | id={id}")
-
     return {"message": "Task deleted"}
 
-
 # -----------------------
-# Productivity Analytics
+# Analytics
 # -----------------------
 
 @app.route("/analytics", methods=["GET"])
 def get_analytics():
 
     total_tasks = Task.query.count()
-
     completed_tasks = Task.query.filter_by(status="completed").count()
-
     pending_tasks = Task.query.filter_by(status="pending").count()
 
     total_reschedules = db.session.query(
         db.func.sum(Task.reschedule_count)
     ).scalar() or 0
 
-    completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
-
-    logging.info("Analytics calculated")
+    completion_rate = (completed_tasks / total_tasks * 100) if total_tasks else 0
 
     return jsonify({
         "total_tasks": total_tasks,
@@ -202,9 +149,8 @@ def get_analytics():
         "total_reschedules": total_reschedules
     })
 
-
 # -----------------------
-# Adaptive Rescheduling Engine
+# Scheduler
 # -----------------------
 
 def reschedule_missed_tasks():
@@ -219,34 +165,16 @@ def reschedule_missed_tasks():
         ).all()
 
         for task in missed_tasks:
-
             task.deadline = now + timedelta(hours=24)
-
             task.reschedule_count += 1
 
         db.session.commit()
-
-        logging.info(
-            f"Scheduler executed | rescheduled_tasks={len(missed_tasks)}"
-        )
-
-
-# -----------------------
-# Start Scheduler
-# -----------------------
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(reschedule_missed_tasks, "interval", minutes=5)
 scheduler.start()
 
-
-# -----------------------
-# Run App
-# -----------------------
-
 if __name__ == "__main__":
-
-    logging.info("Smart Task Manager backend started")
 
     port = int(os.environ.get("PORT", 5000))
 
