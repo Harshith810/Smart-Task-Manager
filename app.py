@@ -75,6 +75,50 @@ class Task(db.Model):
 with app.app_context():
     db.create_all()
 
+@app.route("/register", methods=["POST"])
+def register():
+
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return {"error": "Email and password required"}, 400
+
+    existing_user = User.query.filter_by(email=email).first()
+
+    if existing_user:
+        return {"error": "User already exists"}, 409
+
+    hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+    user = User(
+        email=email,
+        password=hashed_password
+    )
+
+    db.session.add(user)
+    db.session.commit()
+
+    return {"message": "User registered successfully"}
+
+@app.route("/login", methods=["POST"])
+def login():
+
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return {"error": "Invalid credentials"}, 401
+
+    if not bcrypt.checkpw(password.encode(), user.password.encode()):
+        return {"error": "Invalid credentials"}, 401
+
+    return {"user_id": user.id}
+
 # -----------------------
 # Routes
 # -----------------------
