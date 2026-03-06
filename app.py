@@ -45,7 +45,7 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
 
     status = db.Column(
-        db.Enum("pending", "completed", "missed"),
+        db.Enum("pending", "completed", "missed", name="task_status"),
         nullable=False,
         default="pending"
     )
