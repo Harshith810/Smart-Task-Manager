@@ -17,18 +17,27 @@ logging.basicConfig(
 app = Flask(__name__)
 CORS(app)
 
-# MySQL Configuration
+# -----------------------
+# Database Configuration
+# -----------------------
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("postgresql://harshu:BXl2cZAhRYNHVQLCk5CVFKfsFlEjCyYe@dpg-d6l79hrh46gs73dlpslg-a/smart_task_manager_4w8t")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+database_url = os.environ.get("postgresql://harshu:BXl2cZAhRYNHVQLCk5CVFKfsFlEjCyYe@dpg-d6l79hrh46gs73dlpslg-a/smart_task_manager_4w8t")
+
+# Fix for Render postgres URL
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
 # -----------------------
 # Task Model
 # -----------------------
+
 class Task(db.Model):
-    __tablename__ = 'tasks'
+    __tablename__ = "tasks"
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -54,9 +63,9 @@ class Task(db.Model):
     )
 
     status = db.Column(
-        db.Enum('pending', 'completed', 'missed'),
+        db.Enum("pending", "completed", "missed"),
         nullable=False,
-        default='pending'
+        default="pending"
     )
 
     reschedule_count = db.Column(
@@ -69,18 +78,21 @@ class Task(db.Model):
         return {
             "id": self.id,
             "title": self.title,
-            "deadline": self.deadline,
-            "created_at": self.created_at,
-            "completed_at": self.completed_at,
+            "deadline": self.deadline.isoformat() if self.deadline else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
             "status": self.status,
             "reschedule_count": self.reschedule_count
         }
 
+
 # -----------------------
 # Create Tables
 # -----------------------
+
 with app.app_context():
     db.create_all()
+
 
 # -----------------------
 # Routes
@@ -88,17 +100,22 @@ with app.app_context():
 
 @app.route("/")
 def home():
-    return "Backend is working!"
+    return "Smart Task Manager Backend Running 🚀"
+
 
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
+
     tasks = Task.query.all()
+
     logging.info("Fetched all tasks")
+
     return jsonify([task.to_dict() for task in tasks])
 
 
 @app.route("/tasks", methods=["POST"])
 def create_task():
+
     data = request.json
 
     task = Task(
@@ -109,7 +126,9 @@ def create_task():
     db.session.add(task)
     db.session.commit()
 
-    logging.info(f"Task created | id={task.id} | title='{task.title}' | deadline={task.deadline}")
+    logging.info(
+        f"Task created | id={task.id} | title='{task.title}' | deadline={task.deadline}"
+    )
 
     return jsonify(task.to_dict()), 201
 
@@ -153,6 +172,7 @@ def delete_task(id):
 
     return {"message": "Task deleted"}
 
+
 # -----------------------
 # Productivity Analytics
 # -----------------------
@@ -170,10 +190,7 @@ def get_analytics():
         db.func.sum(Task.reschedule_count)
     ).scalar() or 0
 
-    if total_tasks > 0:
-        completion_rate = (completed_tasks / total_tasks) * 100
-    else:
-        completion_rate = 0
+    completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
 
     logging.info("Analytics calculated")
 
@@ -207,11 +224,11 @@ def reschedule_missed_tasks():
 
             task.reschedule_count += 1
 
-            task.status = "pending"
-
         db.session.commit()
 
-        logging.info(f"Scheduler executed | rescheduled_tasks={len(missed_tasks)}")
+        logging.info(
+            f"Scheduler executed | rescheduled_tasks={len(missed_tasks)}"
+        )
 
 
 # -----------------------
@@ -223,7 +240,12 @@ scheduler.add_job(reschedule_missed_tasks, "interval", minutes=5)
 scheduler.start()
 
 
+# -----------------------
+# Run App
+# -----------------------
+
 if __name__ == "__main__":
+
     logging.info("Smart Task Manager backend started")
 
     port = int(os.environ.get("PORT", 5000))
