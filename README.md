@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Smart Task Manager
 
 ### Adaptive Rescheduling & Productivity Analytics
@@ -213,3 +214,6 @@ Server runs at
 # License
 
 MIT License
+=======
+# Smart-Task-Manager
+>>>>>>> c05c5611a0daff528efc66873589cad24e23d4e8

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Smart Task Manager</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+    <div class="navbar">
+
+<div class="logo">
+<i class="fa-solid fa-list-check"></i>
+Smart Task Manager
+</div>
+
+<div class="nav-right">
+<a href="#dashboard" class="nav-item">Dashboard</a>
+<a href="#tasks" class="nav-item">Tasks</a>
+<a href="#analytics-section" class="nav-item">Analytics</a>
+</div>
+
+</div>
+
+<!-- <h1>Smart Task Manager</h1> -->
+
+<div class="container">
+
+<!-- Add Task Section -->
+
+<div class="add-task">
+
+<h2>Add Task</h2>
+
+<input id="title" placeholder="Task title">
+
+<input id="deadline" type="datetime-local">
+
+<button onclick="addTask()">Add Task</button>
+
+</div>
+
+<!-- Dashboard Layout -->
+
+<div class="dashboard" id="dashboard">
+
+<!-- Task List -->
+
+<div class="tasks-section" id="tasks">
+
+<h2>Task List</h2>
+
+<ul id="taskList"></ul>
+
+</div>
+
+<!-- Analytics -->
+
+<div class="analytics-section" id="analytics-section">
+
+<h2>Analytics</h2>
+
+<button onclick="loadAnalytics()">Load Analytics</button>
+
+<div id="analytics"></div>
+
+<canvas id="analyticsChart" width="250" height="250"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
+
