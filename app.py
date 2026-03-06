@@ -75,8 +75,18 @@ class Task(db.Model):
             "reschedule_count": self.reschedule_count
         }
 
+from sqlalchemy import text
+
 with app.app_context():
     db.create_all()
+
+    # Ensure user_id column exists in tasks table
+    try:
+        db.session.execute(text("ALTER TABLE tasks ADD COLUMN user_id INTEGER"))
+        db.session.commit()
+    except:
+        pass
+
 
 @app.route("/register", methods=["POST"])
 def register():
