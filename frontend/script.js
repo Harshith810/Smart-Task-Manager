@@ -126,6 +126,13 @@ position:"bottom"
 })
 
 }
+function logout(){
+
+localStorage.removeItem("user_id")
+
+window.location.href = "login.html"
+
+}
 
 loadTasks()
 setInterval(loadTasks, 5000)
