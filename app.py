@@ -48,6 +48,9 @@ class Task(db.Model):
     __tablename__ = "tasks"
 
     id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
     title = db.Column(db.String(255), nullable=False)
     deadline = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -129,7 +132,8 @@ def home():
 
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
-    tasks = Task.query.all()
+    user_id = request.args.get("user_id")
+    tasks = Task.query.filter_by(user_id=user_id).all()
     return jsonify([task.to_dict() for task in tasks])
 
 @app.route("/tasks", methods=["POST"])
@@ -138,7 +142,8 @@ def create_task():
 
     task = Task(
         title=data["title"],
-        deadline=datetime.fromisoformat(data["deadline"])
+        deadline=datetime.fromisoformat(data["deadline"]),
+        user_id=data["user_id"]
     )
 
     db.session.add(task)
