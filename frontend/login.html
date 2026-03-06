@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login - Smart Task Manager</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Login</h2>
+
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+
+</div>
+
+<script>
+
+const API = "https://smart-task-manager-a5tm.onrender.com"
+
+async function login(){
+
+const email = document.getElementById("email").value
+const password = document.getElementById("password").value
+
+const res = await fetch(API + "/login",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email,password})
+})
+
+const data = await res.json()
+
+if(data.user_id){
+
+localStorage.setItem("user_id",data.user_id)
+
+window.location.href = "index.html"
+
+}else{
+
+alert("Invalid login")
+
+}
+
+}
+
+async function register(){
+
+const email = document.getElementById("email").value
+const password = document.getElementById("password").value
+
+await fetch(API + "/register",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email,password})
+})
+
+alert("User created. Now login.")
+
+}
+
+</script>
+
+</body>
+</html>

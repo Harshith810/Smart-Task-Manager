@@ -1,8 +1,14 @@
+let userId = localStorage.getItem("user_id");
+
+if(!userId){
+    window.location.href = "login.html";
+}
+
 const API = "https://smart-task-manager-a5tm.onrender.com"
 
 async function loadTasks() {
 
-const res = await fetch(API + "/tasks")
+const res = await fetch(API + "/tasks?user_id=" + userId)
 const tasks = await res.json()
 
 const list = document.getElementById("taskList")
@@ -49,7 +55,11 @@ const deadline = document.getElementById("deadline").value
 await fetch(API + "/tasks",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify({title,deadline})
+body:JSON.stringify({
+title,
+deadline,
+user_id:userId
+})
 })
 
 document.getElementById("title").value = ""
