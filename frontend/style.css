@@ -397,6 +397,38 @@ font-size:15px;
 
 }
 
-body{
-border:5px solid red;
+@media (max-width:600px){
+
+li{
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+gap:12px;
+}
+
+.task-left{
+width:100%;
+}
+
+.task-buttons{
+display:flex;
+flex-direction:column;
+width:100%;
+gap:8px;
+}
+
+.task-buttons button{
+width:100%;
+margin:0;
+}
+
+}
+
+@media (max-width:600px){
+
+li{
+padding:18px;
+border-radius:12px;
+}
+
 }
