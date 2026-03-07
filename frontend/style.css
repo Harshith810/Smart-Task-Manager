@@ -30,10 +30,11 @@ font-size:32px;
 }
 
 .container{
-width:900px;
+max-width:900px;
+width:95%;
 background:#f1f5f4;
 border-radius:14px;
-padding:35px;
+padding:25px;
 box-shadow:0 15px 40px rgba(0,0,0,0.18);
 }
 
@@ -170,6 +171,7 @@ align-items:flex-start;
 
 .dashboard{
 flex-direction:column;
+gap:25px;
 }
 
 .tasks-section{
@@ -178,6 +180,7 @@ width:100%;
 
 .analytics-section{
 width:100%;
+margin-top:10px;
 }
 
 }
@@ -342,6 +345,19 @@ justify-content:center;
 
 .logo{
 font-size:20px;
+}
+
+}
+
+@media (max-width:600px){
+
+h1{
+font-size:24px;
+margin-bottom:30px;
+}
+
+.container{
+padding:20px;
 }
 
 }
