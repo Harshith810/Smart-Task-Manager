@@ -339,8 +339,9 @@ width:100%;
 
 .nav-right{
 flex-wrap:wrap;
-gap:15px;
+gap:12px;
 justify-content:center;
+font-size:14px;
 }
 
 .logo{
@@ -361,3 +362,38 @@ padding:20px;
 }
 
 }
+
+@media (max-width:600px){
+
+.task-buttons{
+display:flex;
+flex-direction:column;
+gap:6px;
+margin-top:6px;
+}
+
+.task-buttons button{
+width:100%;
+}
+
+}
+
+@media (max-width:600px){
+
+li{
+flex-direction:column;
+align-items:flex-start;
+gap:10px;
+}
+
+}
+
+@media (max-width:600px){
+
+button{
+padding:12px;
+font-size:15px;
+}
+
+}
+
