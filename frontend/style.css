@@ -166,6 +166,22 @@ margin-top:30px;
 align-items:flex-start;
 }
 
+@media (max-width:800px){
+
+.dashboard{
+flex-direction:column;
+}
+
+.tasks-section{
+width:100%;
+}
+
+.analytics-section{
+width:100%;
+}
+
+}
+
 .tasks-section{
 flex:2;
 }
@@ -296,4 +312,36 @@ display:flex;
 justify-content:center;
 align-items:center;
 height:70vh;
+}
+
+@media (max-width:600px){
+
+.add-task{
+display:flex;
+flex-direction:column;
+}
+
+.add-task input{
+width:100%;
+margin-bottom:10px;
+}
+
+.add-task button{
+width:100%;
+}
+
+}
+
+@media (max-width:600px){
+
+.nav-right{
+flex-wrap:wrap;
+gap:15px;
+justify-content:center;
+}
+
+.logo{
+font-size:20px;
+}
+
 }
