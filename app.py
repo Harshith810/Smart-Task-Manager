@@ -233,7 +233,7 @@ def reschedule_missed_tasks():
         ).all()
 
         for task in missed_tasks:
-            task.deadline = now + timedelta(hours=24)
+            task.deadline = task.deadline + timedelta(days=1)
             task.reschedule_count += 1
 
         db.session.commit()

@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Task Manager</title>
+<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1828/1828919.png">
 
 <link rel="stylesheet" href="style.css">
 
@@ -25,6 +26,7 @@ Smart Task Manager
 <a href="#dashboard" class="nav-item">Dashboard</a>
 <a href="#tasks" class="nav-item">Tasks</a>
 <a href="#analytics-section" class="nav-item">Analytics</a>
+<a href="#" class="nav-item" onclick="loadHistory()">History</a>
 <a href="#" class="nav-item" onclick="logout()">Logout</a>
 </div>
 
@@ -56,9 +58,26 @@ Smart Task Manager
 
 <div class="tasks-section" id="tasks">
 
-<h2>Task List</h2>
+<div class="tasks-wrapper">
 
-<ul id="taskList"></ul>
+<div class="task-card">
+
+<h2>Today's Tasks</h2>
+<ul id="todayTasks"></ul>
+
+</div>
+
+<div class="task-card">
+
+<h2 id="yesterdayTitle" style="display:none;">
+Yesterday's Pending Tasks
+</h2>
+
+<ul id="yesterdayTasks"></ul>
+
+</div>
+
+</div>
 
 </div>
 
@@ -76,6 +95,11 @@ Smart Task Manager
 
 </div>
 
+</div>
+
+<div id="history-section" style="display:none; margin-top:30px;">
+<h2>Task History</h2>
+<ul id="historyList"></ul>
 </div>
 
 </div>
